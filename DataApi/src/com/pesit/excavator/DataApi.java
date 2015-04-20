@@ -169,95 +169,104 @@ public class DataApi {
 	{	
 
 		//Use Gson api to extract content from JSON string
-		int start = json_str.indexOf('[');
 		
-		int end = json_str.indexOf(']');
-		String newstr = json_str.substring(start,end+1);
-	 	Gson gson = new Gson();
-	 	//System.out.println("JSON string is" + newstr);
-	 	newstr.replaceAll("\"", "\'");
-		ArrayList<LinkedTreeMap<String,String>> la = new ArrayList<LinkedTreeMap<String,String>>();
-		List<LinkedTreeMap<String,String>> list = gson.fromJson(newstr, la.getClass()); //populating list of lists with json data
-		
-		//Create an array of generic Object type
-		
-		Object[] array_return = new Object[list.size()]; 
-		Class aclass = o.getClass();	//we get the class type from object passed.
-		
-		int i = 0;
-		for(LinkedTreeMap<String,String> a:list)
+		if(json_str.indexOf("status") != -1)
 		{
+			System.out.println("An error occured!");
+	
+		}
+		else
+		{
+			int start = json_str.indexOf('[');
+		
+			int end = json_str.indexOf(']');
+			String newstr = json_str.substring(start,end+1);
+		 	Gson gson = new Gson();
+		 	//System.out.println("JSON string is" + newstr);
+		 	newstr.replaceAll("\"", "\'");
+			ArrayList<LinkedTreeMap<String,String>> la = new ArrayList<LinkedTreeMap<String,String>>();
+			List<LinkedTreeMap<String,String>> list = gson.fromJson(newstr, la.getClass()); //populating list of lists with json data
 			
+			//Create an array of generic Object type
 			
-			Object o1 = null;
-			try 
+			Object[] array_return = new Object[list.size()]; 
+			Class aclass = o.getClass();	//we get the class type from object passed.
+			
+			int i = 0;
+			for(LinkedTreeMap<String,String> a:list)
 			{
-				o1 = aclass.newInstance();
-			}
-			catch (InstantiationException e2) 
-			{
-				// TODO Auto-generated catch block
-				System.out.println("ERROR Instantiating user class ");
-				e2.printStackTrace();
-			}
-			catch (IllegalAccessException e2) 
-			{
-				// TODO Auto-generated catch block
-				System.out.println("ERROR Instantiating user class ");
-				e2.printStackTrace();
-			}
-			//traverse the ds to get key,value pairs for each row.
-			for(Map.Entry<String, String> m: a.entrySet())
-			{
-				String key = m.getKey();
-				String val = m.getValue();
 				
-
+				
+				Object o1 = null;
 				try 
 				{
-					//gets the field whose name is 'key' and stores it in field
-					Field field = aclass.getField(key);
-					//sets the 'field' of object o1 as val
-					field.set(o1,val); 
-					//System.out.println("Setting value "+val+" for variable "+key);
+					o1 = aclass.newInstance();
+				}
+				catch (InstantiationException e2) 
+				{
+					// TODO Auto-generated catch block
+					System.out.println("ERROR Instantiating user class ");
+					e2.printStackTrace();
+				}
+				catch (IllegalAccessException e2) 
+				{
+					// TODO Auto-generated catch block
+					System.out.println("ERROR Instantiating user class ");
+					e2.printStackTrace();
+				}
+				//traverse the ds to get key,value pairs for each row.
+				for(Map.Entry<String, String> m: a.entrySet())
+				{
+					String key = m.getKey();
+					String val = m.getValue();
 					
-				}
-				catch (NoSuchFieldException e) 
-				{
-					// TODO Auto-generated catch block
-					System.out.println("CATCH due to class JSON mismatch");
-					e.printStackTrace();
+	
+					try 
+					{
+						//gets the field whose name is 'key' and stores it in field
+						Field field = aclass.getField(key);
+						//sets the 'field' of object o1 as val
+						field.set(o1,val); 
+						//System.out.println("Setting value "+val+" for variable "+key);
+						
+					}
+					catch (NoSuchFieldException e) 
+					{
+						// TODO Auto-generated catch block
+						System.out.println("CATCH due to class JSON mismatch");
+						e.printStackTrace();
+						
+					} 
+					catch (SecurityException e) 
+					{
+						// TODO Auto-generated catch block
+						System.out.println("CATCH due to class JSON mismatch");
+						e.printStackTrace();
+					}
+					catch (IllegalArgumentException e1) 
+					{
+						// TODO Auto-generated catch block
+						System.out.println("CATCH due to class JSON mismatch");
+						e1.printStackTrace();
+					}
+					catch (IllegalAccessException e1) 
+					{
+						// TODO Auto-generated catch block
+						System.out.println("CATCH due to class JSON mismatch");
+						e1.printStackTrace();
+					}
 					
-				} 
-				catch (SecurityException e) 
-				{
-					// TODO Auto-generated catch block
-					System.out.println("CATCH due to class JSON mismatch");
-					e.printStackTrace();
-				}
-				catch (IllegalArgumentException e1) 
-				{
-					// TODO Auto-generated catch block
-					System.out.println("CATCH due to class JSON mismatch");
-					e1.printStackTrace();
-				}
-				catch (IllegalAccessException e1) 
-				{
-					// TODO Auto-generated catch block
-					System.out.println("CATCH due to class JSON mismatch");
-					e1.printStackTrace();
 				}
 				
+				//assign the object to one element of the array_return
+				array_return[i++] = o1;
+				
 			}
-			
-			//assign the object to one element of the array_return
-			array_return[i++] = o1;
-			
+		
+			//System.out.println("Finally!!" + array_return);
+			return array_return;
+			//return o1;
 		}
-	
-		//System.out.println("Finally!!" + array_return);
-		return array_return;
-		//return o1;
 	}
 	
 }
